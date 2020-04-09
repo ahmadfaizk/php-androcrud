@@ -26,8 +26,17 @@ function getMahasiswa($conn) {
     return $mahasiswa;
 }
 
-function updateMahasiswa($conn, $id, $nama, $alamat, $foto) {
+function updateMahasiswaAndUploadImage($conn, $id, $nama, $alamat, $foto) {
     $sql = "UPDATE profile SET nama='$nama', alamat='$alamat', foto='$foto' WHERE id=$id";
+    if (mysqli_query($conn, $sql)) {
+        return true;
+    }
+    mysqli_close($conn);
+    return false;
+}
+
+function updateMahasiswa($conn, $id, $nama, $alamat) {
+    $sql = "UPDATE profile SET nama='$nama', alamat='$alamat' WHERE id=$id";
     if (mysqli_query($conn, $sql)) {
         return true;
     }

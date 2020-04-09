@@ -3,7 +3,7 @@
 include '../model/mahasiswa.php';
 include '../config/config.php';
 
-function isTheseParametersAvailable($params){
+function isTheseParametersAvailable($params, $image){
     $available = true;
     $missingparams = "";
     $errors = array();
@@ -14,18 +14,20 @@ function isTheseParametersAvailable($params){
             $errors[$param] = 'The ' . $param . ' field is required.';
         }
     }
-    if(!isset($_FILES['foto'])) {
-        $available = false;
-        $errors['foto'] = 'The foto field is required.';
-    } 
-    else {
-        $image_ext = array('jpeg', 'jpg', 'png');
-        $tmp = explode('.', $_FILES['foto']['name']);
-        $file_ext = strtolower(end($tmp));
-        if (in_array($file_ext, $image_ext) == false) {
+    if($image) {
+        if(!isset($_FILES['foto'])) {
             $available = false;
-            $errors['foto'] = 'The foto must be a file of type: jpeg, jpg, or png';
-        }
+            $errors['foto'] = 'The foto field is required.';
+        } 
+        else {
+            $image_ext = array('jpeg', 'jpg', 'png');
+            $tmp = explode('.', $_FILES['foto']['name']);
+            $file_ext = strtolower(end($tmp));
+            if (in_array($file_ext, $image_ext) == false) {
+                $available = false;
+                $errors['foto'] = 'The foto must be a file of type: jpeg, jpg, or png';
+            }
+        }   
     }
     if(!$available){
         $response = array();
@@ -48,7 +50,7 @@ $response = array();
 if(isset($_GET['apicall'])){
     switch($_GET['apicall']){
         case 'create_mahasiswa':
-            isTheseParametersAvailable(array('nama','alamat'));
+            isTheseParametersAvailable(array('nama','alamat'), true);
             savePhoto();
             $result=createMahasiswa($conn, $_POST['nama'], $_POST['alamat'], $_FILES['foto']['name']);
             if($result){
@@ -61,12 +63,18 @@ if(isset($_GET['apicall'])){
             }
             break;
         case 'update_mahasiswa':
-            isTheseParametersAvailable(array('id','nama','alamat'));
-            savePhoto();
-            $result=updateMahasiswa($conn,$_POST['id'], $_POST['nama'], $_POST['alamat'], $_FILES['foto']['name']);
+            $imageAvailable = isset($_FILES['foto']);
+            isTheseParametersAvailable(array('id','nama','alamat'), $imageAvailable);
+            if($imageAvailable) {
+                savePhoto();
+                $result=updateMahasiswaAndUploadImage($conn,$_POST['id'], $_POST['nama'], $_POST['alamat'], $_FILES['foto']['name']);
+            } else {
+                $result=updateMahasiswa($conn,$_POST['id'], $_POST['nama'], $_POST['alamat']);
+            }
+            
             if($result){
                 $response['error']=false;
-                $response['message'] = 'Mahasiswa berhasil ditambahkan';
+                $response['message'] = 'Mahasiswa berhasil diubah';
                 $response['mahasiswa'] = getMahasiswa($conn);
             }else{
                 $response['error'] = true;
