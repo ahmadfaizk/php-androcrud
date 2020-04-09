@@ -17,9 +17,11 @@ function isTheseParametersAvailable($params){
     if(!isset($_FILES['foto'])) {
         $available = false;
         $errors['foto'] = 'The foto field is required.';
-    } else {
+    } 
+    else {
         $image_ext = array('jpeg', 'jpg', 'png');
-        $file_ext = strtolower(end(explode('.',$_FILES['foto']['name'])));
+        $tmp = explode('.', $_FILES['foto']['name']);
+        $file_ext = strtolower(end($tmp));
         if (in_array($file_ext, $image_ext) == false) {
             $available = false;
             $errors['foto'] = 'The foto must be a file of type: jpeg, jpg, or png';
