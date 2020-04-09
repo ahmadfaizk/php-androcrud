@@ -1,7 +1,7 @@
 <?php
 
-function createMahasiswa($conn, $nama, $alamat) {
-    $sql = "INSERT INTO profile(nama,alamat) VALUES('$nama','$alamat')";
+function createMahasiswa($conn, $nama, $alamat, $foto) {
+    $sql = "INSERT INTO profile(nama, alamat, foto) VALUES('$nama','$alamat', '$foto')";
     if (mysqli_query($conn, $sql)) {
         return true;
     }
@@ -19,14 +19,15 @@ function getMahasiswa($conn) {
         $mahasiswa_temp['id'] = $row['id'];
         $mahasiswa_temp['nama'] = $row['nama'];
         $mahasiswa_temp['alamat'] = $row['alamat'];
+        $mahasiswa_temp['foto'] = $row['foto'];
         array_push($mahasiswa, $mahasiswa_temp);
     }
     mysqli_close($conn);
     return $mahasiswa;
 }
 
-function updateMahasiswa($conn, $id, $nama, $alamat) {
-    $sql = "UPDATE profile SET nama='$nama', alamat='$alamat' WHERE id=$id";
+function updateMahasiswa($conn, $id, $nama, $alamat, $foto) {
+    $sql = "UPDATE profile SET nama='$nama', alamat='$alamat', foto='$foto' WHERE id=$id";
     if (mysqli_query($conn, $sql)) {
         return true;
     }
